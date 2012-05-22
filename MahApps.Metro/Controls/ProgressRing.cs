@@ -88,16 +88,13 @@ namespace MahApps.Metro.Controls
 
         private void SetEllipseDiameter(double width)
         {
-            if (width <= 60)
-            {
-                EllipseDiameter = 6.0;
-            }
-            else
+            this.EllipseDiameter = width < 50 ? 4.0 : 5.0;
+
+            if (width >= 60)
             {
                 EllipseDiameter = width * 0.1 + 6;
             }
         }
-
 
         private void SetEllipseOffset(double width)
         {

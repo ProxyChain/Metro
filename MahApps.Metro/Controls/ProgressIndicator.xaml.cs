@@ -24,14 +24,11 @@ namespace MahApps.Metro.Controls
 
         public void Stop()
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
-                                                  {
-                                                      var s = this.Resources["animate"] as Storyboard;
-                                                      s.Stop();
-                                                      this.Visibility = Visibility.Collapsed;
-                                                  })
-                );
+            var s = this.Resources["animate"] as Storyboard;
+            s.Stop();
+            this.Visibility = Visibility.Collapsed;
         }
+
         private void ToggleAnimation(object sender, DependencyPropertyChangedEventArgs e)
         {
             if ((bool)e.NewValue)
@@ -46,7 +43,7 @@ namespace MahApps.Metro.Controls
             }
             else
             {
-               Stop();
+               this.Stop();
             }
         }
     }
