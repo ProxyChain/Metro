@@ -645,7 +645,7 @@
                                                                SnapsToDevicePixels="True"
                                                                IsHitTestVisible="False" 
                                                                Opacity="0.25"
-                                                               Width="0" Height="15" VerticalAlignment="Stretch" HorizontalAlignment="Right" 
+                                                               Width="0" Height="10" VerticalAlignment="Stretch" HorizontalAlignment="Right" 
                                                                Fill="{TemplateBinding Foreground}" Margin="10,0,0,0" />
                                                 </Grid>
                                                 <ControlTemplate.Triggers>
