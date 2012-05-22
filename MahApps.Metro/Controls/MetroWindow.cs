@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using MahApps.Metro.Native;
 
 namespace MahApps.Metro.Controls
 {
@@ -10,11 +13,22 @@ namespace MahApps.Metro.Controls
     {
         private const string PART_TitleBar = "PART_TitleBar";
         private const string PART_WindowCommands = "PART_WindowCommands";
+        private readonly int doubleclick = UnsafeNativeMethods.GetDoubleClickTime();
+        private DateTime lastMouseClick;
 
         public static readonly DependencyProperty ShowIconOnTitleBarProperty = DependencyProperty.Register("ShowIconOnTitleBar", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
         public static readonly DependencyProperty ShowTitleBarProperty = DependencyProperty.Register("ShowTitleBar", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
         public static readonly DependencyProperty ShowMinButtonProperty = DependencyProperty.Register("ShowMinButton", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
+        public static readonly DependencyProperty ShowCloseButtonProperty = DependencyProperty.Register("ShowCloseButton", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
         public static readonly DependencyProperty ShowMaxRestoreButtonProperty = DependencyProperty.Register("ShowMaxRestoreButton", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
+        public static readonly DependencyProperty TitlebarHeightProperty = DependencyProperty.Register("TitlebarHeight", typeof(int), typeof(MetroWindow), new PropertyMetadata(30));
+        public static readonly DependencyProperty SavePositionProperty = DependencyProperty.Register("SaveWindowPosition", typeof(bool), typeof(MetroWindow), new PropertyMetadata(false));
+
+        public bool SaveWindowPosition
+        {
+            get { return (bool)GetValue(SavePositionProperty); }
+            set { SetValue(SavePositionProperty, value); }
+        }
 
         static MetroWindow()
         {
@@ -41,6 +55,18 @@ namespace MahApps.Metro.Controls
             set { SetValue(ShowMinButtonProperty, value); }
         }
 
+        public bool ShowCloseButton
+        {
+            get { return (bool)GetValue(ShowCloseButtonProperty); }
+            set { SetValue(ShowCloseButtonProperty, value); }
+        }
+
+        public int TitlebarHeight
+        {
+            get { return (int)GetValue(TitlebarHeightProperty); }
+            set { SetValue(TitlebarHeightProperty, value); }
+        }
+
         public bool ShowMaxRestoreButton
         {
             get { return (bool)GetValue(ShowMaxRestoreButtonProperty); }
@@ -59,12 +85,12 @@ namespace MahApps.Metro.Controls
             if (ShowTitleBar && titleBar != null)
             {
                 titleBar.MouseDown += TitleBarMouseDown;
+                titleBar.MouseUp += TitleBarMouseUp;
                 titleBar.MouseMove += TitleBarMouseMove;
             }
             else
             {
                 MouseDown += TitleBarMouseDown;
-                MouseMove += TitleBarMouseMove;
             }
         }
 
@@ -83,18 +109,47 @@ namespace MahApps.Metro.Controls
             if (e.RightButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed && e.LeftButton == MouseButtonState.Pressed)
                 DragMove();
 
-            if (e.ClickCount == 2)
+            if (e.ClickCount == 2 && (ResizeMode == ResizeMode.CanResizeWithGrip || ResizeMode == ResizeMode.CanResize))
             {
                 WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
             }
         }
 
-        protected void TitleBarMouseMove(object sender, MouseEventArgs e)
+        protected void TitleBarMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!ShowIconOnTitleBar) return;
+            var mousePosition = GetCorrectPosition(this);
+
+            if (mousePosition.X <= TitlebarHeight && mousePosition.Y <= TitlebarHeight)
+            {
+                if ((DateTime.Now - lastMouseClick).TotalMilliseconds <= doubleclick)
+                {
+                    Close();
+                    return;
+                }
+                lastMouseClick = DateTime.Now;
+
+                ShowSystemMenuPhysicalCoordinates(this, PointToScreen(new Point(0, TitlebarHeight)));
+            }
+            else if (e.ChangedButton == MouseButton.Right)
+            {
+                ShowSystemMenuPhysicalCoordinates(this, PointToScreen(GetCorrectPosition(this)));
+            }
+        }
+
+        private static Point GetCorrectPosition(Visual relativeTo)
+        {
+            UnsafeNativeMethods.Win32Point w32Mouse;
+            UnsafeNativeMethods.GetCursorPos(out w32Mouse);
+            return relativeTo.PointFromScreen(new Point(w32Mouse.X, w32Mouse.Y));
+        }
+
+        private void TitleBarMouseMove(object sender, MouseEventArgs e)
         {
             if (e.RightButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed
                 && e.LeftButton == MouseButtonState.Pressed && WindowState == WindowState.Maximized)
             {
-                // Calcualting correct left coordinate for multi-screen system.
+                // Calculating correct left coordinate for multi-screen system.
                 Point mouseAbsolute = PointToScreen(Mouse.GetPosition(this));
                 double width = RestoreBounds.Width;
                 double left = mouseAbsolute.X - width / 2;
@@ -103,7 +158,11 @@ namespace MahApps.Metro.Controls
                 double virtualScreenWidth = SystemParameters.VirtualScreenWidth;
                 left = left + width > virtualScreenWidth ? virtualScreenWidth - width : left;
 
-                Top = mouseAbsolute.Y - e.MouseDevice.GetPosition(this).Y;
+                var mousePosition = e.MouseDevice.GetPosition(this);
+
+                // When dragging the window down at the very top of the border,
+                // move the window a bit upwards to avoid showing the resize handle as soon as the mouse button is released
+                Top = mousePosition.Y < 5 ? -5 : mouseAbsolute.Y - mousePosition.Y;
                 Left = left;
 
                 // Restore window to normal state.
@@ -116,6 +175,21 @@ namespace MahApps.Metro.Controls
         internal T GetPart<T>(string name) where T : DependencyObject
         {
             return (T)GetTemplateChild(name);            
+        }
+
+        private static void ShowSystemMenuPhysicalCoordinates(Window window, Point physicalScreenLocation)
+        {
+            if (window == null) return;
+
+            var hwnd = new WindowInteropHelper(window).Handle;
+            if (hwnd == IntPtr.Zero || !UnsafeNativeMethods.IsWindow(hwnd))
+                return;
+
+            var hmenu = UnsafeNativeMethods.GetSystemMenu(hwnd, false);
+
+            var cmd = UnsafeNativeMethods.TrackPopupMenuEx(hmenu, Constants.TPM_LEFTBUTTON | Constants.TPM_RETURNCMD, (int)physicalScreenLocation.X, (int)physicalScreenLocation.Y, hwnd, IntPtr.Zero);
+            if (0 != cmd)
+                UnsafeNativeMethods.PostMessage(hwnd, Constants.SYSCOMMAND, new IntPtr(cmd), IntPtr.Zero);
         }
     }
 }

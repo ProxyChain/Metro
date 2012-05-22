@@ -50,31 +50,24 @@
                                         Width="154.002">
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Light Red"
-                                                      Click="MiLightRed" />
-                                            <MenuItem Header="Light Green"
-                                                      Click="MiLightGreen" />
-                                            <MenuItem Header="Light Blue"
-                                                      Click="MiLightBlue" />
-                                            <MenuItem Header="Light Purple"
-                                                      Click="MiLightPurple" />
+                                            <MenuItem Header="Light Red" Click="MiLightRed" />
+                                            <MenuItem Header="Light Green" Click="MiLightGreen" />
+                                            <MenuItem Header="Light Blue" Click="MiLightBlue" />
+                                            <MenuItem Header="Light Purple" Click="MiLightPurple" />
                                             <Separator />
-                                            <MenuItem Header="Dark Red"
-                                                      Click="MiDarkRed" />
-                                            <MenuItem Header="Dark Green"
-                                                      Click="MiDarkGreen" />
-                                            <MenuItem Header="Dark Blue"
-                                                      Click="MiDarkBlue" />
-                                            <MenuItem Header="Dark Purple"
-                                                      Click="MiDarkPurple" />
+                                            <MenuItem Header="Dark Red" Click="MiDarkRed" />
+                                            <MenuItem Header="Dark Green" Click="MiDarkGreen" />
+                                            <MenuItem Header="Dark Blue" Click="MiDarkBlue" />
+                                            <MenuItem Header="Dark Purple" Click="MiDarkPurple" />
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                 </Button>
-                                <PasswordBox Margin="88.695,66.96,0,0"
-                                             Height="30"
+                            <PasswordBox Controls:TextboxHelper.Watermark="Enter Password"
+                                             Margin="88.695,66.96,0,0"
                                              VerticalAlignment="Top"
                                              HorizontalAlignment="Left"
-                                             Width="154.001" />
+                                             Width="154.001"
+											 VerticalContentAlignment="Center" />
                                 <CheckBox Content="CheckBox"
                                           Margin="88.695,100.96,0,0"
                                           VerticalAlignment="Top"
@@ -84,11 +77,13 @@
                                              VerticalAlignment="Top"
                                              GroupName="test"
                                              HorizontalAlignment="Left" />
-                                <TextBox Text="This is a textbox"
+                            <TextBox Controls:TextboxHelper.Watermark="Enter Username"
+                                     Controls:TextboxHelper.ClearTextButton="True"
                                          Margin="88.694,36.96,0,0"
                                          VerticalAlignment="Top"
                                          HorizontalAlignment="Left"
-                                         Width="154.002" />
+                                         Width="154.002"
+										 VerticalContentAlignment="Center" />
                                 <ComboBox Margin="88.292,176.84,0,0"
                                           VerticalAlignment="Top"
                                           HorizontalAlignment="Left"
@@ -214,27 +209,34 @@
                             		</Rectangle>
 
                             	</Button>
-                            </WrapPanel>
+
+                            <Controls:ProgressRing IsActive="True"/>
+                            <Controls:TransitioningContentControl x:Name="transitioning" Width="150" Height="50" Transition="DownTransition" />
+                        </WrapPanel>
                             <!--<Slider Height="23" HorizontalAlignment="Left" Margin="273,119,0,0" Name="slider1" VerticalAlignment="Top" Width="218" Maximum="100" Value="50" />-->
                         </Grid>
                 </TabItem>
                 <TabItem Header="_More Controls Here!">
                     <StackPanel>
+                        <!--<Controls:MetroProgressBar Width="600" IsIndeterminate="True"/>-->
+                        
                         <Controls:ProgressIndicator ProgressColour="{StaticResource AccentColorBrush}"
                                                     Height="6"
                                                     Width="600" />
-                        <Controls:ToggleSwitch HorizontalAlignment="Left"
-                                               Margin="0,10,0,0" />
+                        <Controls:ToggleSwitch HorizontalAlignment="Left" Width="150" Height="75"  Margin="0,10,0,0"  Header="WiFi rest state" />
                         <Slider Margin="0,10,0,0"
                                 HorizontalAlignment="Left"
                                 Width="261.667"
                                 Value="5"
-                                IsEnabled="False"
                                 SmallChange="0.5" />
                         <!--<Slider Height="23" HorizontalAlignment="Left" Margin="273,119,0,0" Name="slider1" VerticalAlignment="Top" Width="218" Maximum="100" Value="50" />-->
                         <TextBlock Text="ComboBox Binding scenario" />
                         <ComboBox ItemsSource="{Binding Artists}"
                                   DisplayMemberPath="name" />
+
+                        <TextBlock Text="Editable ComboBox Binding scenario" />
+                        <ComboBox ItemsSource="{Binding Artists}"
+                                  DisplayMemberPath="name" IsEditable="True" Text="{Binding Path=ArtistName, Mode=TwoWay}" IsReadOnly="False" />
 
                         <TextBlock Text="Items specified in xaml scenario" />
                         <ComboBox>
