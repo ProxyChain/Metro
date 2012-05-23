@@ -144,12 +144,12 @@ namespace MahApps.Metro.Controls
 
         private void SetEllipseDiameter(double width)
         {
-            if (width <= 180)
+            if (width <= 380)
             {
                 EllipseDiameter = 4;
                 return;
             }
-            if (width <= 280)
+            if (width <= 580)
             {
                 EllipseDiameter = 5;
                 return;

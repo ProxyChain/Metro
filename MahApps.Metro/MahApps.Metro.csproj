@@ -85,9 +85,6 @@
     <Compile Include="Controls\MetroWindow.cs" />
     <Compile Include="Controls\Panorama.cs" />
     <Compile Include="Controls\PanoramaItem.cs" />
-    <Compile Include="Controls\ProgressIndicator.xaml.cs">
-      <DependentUpon>ProgressIndicator.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\RevealImage.xaml.cs">
       <DependentUpon>RevealImage.xaml</DependentUpon>
     </Compile>
@@ -117,10 +114,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Controls\ProgressIndicator.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Controls\RevealImage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
