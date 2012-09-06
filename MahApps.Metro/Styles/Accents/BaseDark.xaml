@@ -14,4 +14,6 @@
 
     <Color x:Key="GrayNormal">#FF454545</Color>
     <Color x:Key="GrayHover">#FF959595</Color>
+    <Color x:Key="GrayNormal">#FF7D7D7D</Color>
+    <Color x:Key="GrayHover">#FFAAAAAA</Color>
 </ResourceDictionary>

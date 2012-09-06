@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -20,7 +21,7 @@ namespace MahApps.Metro.Controls
         {
             obj.SetValue(IsMonitoringProperty, value);
         }
-        
+
         public static string GetWatermark(DependencyObject obj)
         {
             return (string)obj.GetValue(WatermarkProperty);
@@ -31,7 +32,6 @@ namespace MahApps.Metro.Controls
             obj.SetValue(WatermarkProperty, value);
         }
 
-        
         private static void SetTextLength(DependencyObject obj, int value)
         {
             obj.SetValue(TextLengthProperty, value);
@@ -68,14 +68,16 @@ namespace MahApps.Metro.Controls
         static void TextChanged(object sender, TextChangedEventArgs e)
         {
             var txtBox = sender as TextBox;
-            if (txtBox == null) return;
+            if (txtBox == null)
+                return;
             SetTextLength(txtBox, txtBox.Text.Length);
         }
 
         static void PasswordChanged(object sender, RoutedEventArgs e)
         {
             var passBox = sender as PasswordBox;
-            if (passBox == null) return;
+            if (passBox == null)
+                return;
             SetTextLength(passBox, passBox.Password.Length);
         }
 
@@ -92,28 +94,25 @@ namespace MahApps.Metro.Controls
         private static void ClearTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textbox = d as TextBox;
-            if (textbox != null) 
+            if (textbox != null)
                 textbox.Loaded += TextBoxLoaded;
         }
 
         static void TextBoxLoaded(object sender, RoutedEventArgs e)
         {
-            if (!(sender is TextBox)) 
+            if (!(sender is TextBox))
                 return;
 
             var textbox = sender as TextBox;
-
-            var setter =textbox.Style.Setters.FirstOrDefault(s => ((Setter) s).Property.ToString() == "Template") as Setter;
-
-            if (setter == null) 
+            if (textbox.Style == null)
                 return;
 
-            var template = setter.Value as ControlTemplate;
-            if (template == null) 
+            var template = textbox.Template;
+            if (template == null)
                 return;
 
             var button = template.FindName("PART_ClearText", textbox) as Button;
-            if (button == null) 
+            if (button == null)
                 return;
 
             if (GetClearTextButton(textbox))
@@ -124,7 +123,7 @@ namespace MahApps.Metro.Controls
 
         static void ClearTextClicked(object sender, RoutedEventArgs e)
         {
-            var button = ((Button) sender);
+            var button = ((Button)sender);
             var parent = VisualTreeHelper.GetParent(button);
             while (!(parent is TextBox))
             {

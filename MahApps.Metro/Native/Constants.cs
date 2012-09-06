@@ -22,7 +22,17 @@
         public const uint TPM_RETURNCMD = 0x0100;
         public const uint TPM_LEFTBUTTON = 0x0;
         public const int SW_SHOWNORMAL = 1;
-        public  const int SW_SHOWMINIMIZED = 2;
+        public const int SW_SHOWMINIMIZED = 2;
         public const uint SYSCOMMAND = 0x0112;
+        public const int WM_INITMENU = 0x116;
+
+        public const int SC_MAXIMIZE = 0xF030;
+        public const int SC_SIZE = 0xF000;
+        public const int SC_MINIMIZE = 0xF020;
+        public const int SC_RESTORE = 0xF120;
+        public const int SC_MOVE = 0xF010;
+        public const int MF_GRAYED = 0x00000001;
+        public const int MF_BYCOMMAND = 0x00000000;
+        public const int MF_ENABLED = 0x00000000;
     }
 }

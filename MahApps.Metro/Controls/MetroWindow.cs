@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -22,7 +25,17 @@ namespace MahApps.Metro.Controls
         public static readonly DependencyProperty ShowCloseButtonProperty = DependencyProperty.Register("ShowCloseButton", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
         public static readonly DependencyProperty ShowMaxRestoreButtonProperty = DependencyProperty.Register("ShowMaxRestoreButton", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
         public static readonly DependencyProperty TitlebarHeightProperty = DependencyProperty.Register("TitlebarHeight", typeof(int), typeof(MetroWindow), new PropertyMetadata(30));
+        public static readonly DependencyProperty TitleCapsProperty = DependencyProperty.Register("TitleCaps", typeof(bool), typeof(MetroWindow), new PropertyMetadata(true));
         public static readonly DependencyProperty SavePositionProperty = DependencyProperty.Register("SaveWindowPosition", typeof(bool), typeof(MetroWindow), new PropertyMetadata(false));
+        public static readonly DependencyProperty TitleForegroundProperty = DependencyProperty.Register("TitleForeground", typeof(Brush), typeof(MetroWindow));
+
+        public ObservableCollection<Flyout> Flyouts { get; set; }
+
+        public Brush TitleForeground
+        {
+            get { return (Brush)GetValue(TitleForegroundProperty); }
+            set { SetValue(TitleForegroundProperty, value); }
+        }
 
         public bool SaveWindowPosition
         {
@@ -30,6 +43,11 @@ namespace MahApps.Metro.Controls
             set { SetValue(SavePositionProperty, value); }
         }
 
+        public MetroWindow()
+        {
+            if (Flyouts == null)
+                Flyouts = new ObservableCollection<Flyout>();
+        }
         static MetroWindow()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MetroWindow), new FrameworkPropertyMetadata(typeof(MetroWindow)));
@@ -39,13 +57,13 @@ namespace MahApps.Metro.Controls
 
         public bool ShowIconOnTitleBar
         {
-            get { return (bool) GetValue(ShowIconOnTitleBarProperty); }
+            get { return (bool)GetValue(ShowIconOnTitleBarProperty); }
             set { SetValue(ShowIconOnTitleBarProperty, value); }
         }
 
         public bool ShowTitleBar
         {
-            get { return (bool) GetValue(ShowTitleBarProperty); }
+            get { return (bool)GetValue(ShowTitleBarProperty); }
             set { SetValue(ShowTitleBarProperty, value); }
         }
 
@@ -72,7 +90,18 @@ namespace MahApps.Metro.Controls
             get { return (bool)GetValue(ShowMaxRestoreButtonProperty); }
             set { SetValue(ShowMaxRestoreButtonProperty, value); }
         }
-        
+
+        public bool TitleCaps
+        {
+            get { return (bool)GetValue(TitleCapsProperty); }
+            set { SetValue(TitleCapsProperty, value); }
+        }
+
+        public string WindowTitle
+        {
+            get { return TitleCaps ? Title.ToUpper() : Title; }
+        }
+
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -147,7 +176,8 @@ namespace MahApps.Metro.Controls
         private void TitleBarMouseMove(object sender, MouseEventArgs e)
         {
             if (e.RightButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed
-                && e.LeftButton == MouseButtonState.Pressed && WindowState == WindowState.Maximized)
+                && e.LeftButton == MouseButtonState.Pressed && WindowState == WindowState.Maximized
+                && ResizeMode != ResizeMode.NoResize)
             {
                 // Calculating correct left coordinate for multi-screen system.
                 Point mouseAbsolute = PointToScreen(Mouse.GetPosition(this));
@@ -174,7 +204,7 @@ namespace MahApps.Metro.Controls
 
         internal T GetPart<T>(string name) where T : DependencyObject
         {
-            return (T)GetTemplateChild(name);            
+            return (T)GetTemplateChild(name);
         }
 
         private static void ShowSystemMenuPhysicalCoordinates(Window window, Point physicalScreenLocation)

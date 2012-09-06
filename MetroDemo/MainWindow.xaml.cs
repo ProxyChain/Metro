@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using MahApps.Metro;
+using MahApps.Metro.Controls;
 
 namespace MetroDemo
 {
@@ -20,14 +21,17 @@ namespace MetroDemo
         }
 
         int i = 0;
-        void Tick(object sender, System.EventArgs e)
+        void Tick(object sender, EventArgs e)
         {
             transitioning.Content = new TextBlock {Text = "hello " + i++};
         }
 
         private void ButtonClick(object sender, RoutedEventArgs e)
         {
+            var x = pivot.Items;
             pb.IsIndeterminate = !pb.IsIndeterminate;
+            Flyouts[0].IsOpen = !Flyouts[0].IsOpen;
+            Flyouts[1].IsOpen = !Flyouts[1].IsOpen;
         }
 
         private void MiLightRed(object sender, RoutedEventArgs e)
@@ -74,6 +78,17 @@ namespace MetroDemo
         {
             //new ChildWindow().ShowDialog();
             new PanoramaDemo().Show();
+            
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            pivot.GoToItem(pi3);
+        }
+
+        private void BtnVSClick(object sender, RoutedEventArgs e)
+        {
+            new VSDemo().Show();
         }
     }
 }
